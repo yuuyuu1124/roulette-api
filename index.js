@@ -108,7 +108,7 @@ app.get("/admin", (req, res) => {
         <p>以下のスプレッドシートにログが記録されています：</p>
 
         <a
-          href="https://docs.google.com/spreadsheets/d/1afL2PpEKgWL2xIuICwCsUUGmiTqHm0f2qBNrkiJwsgQ/edit"
+          href="https://docs.google.com/spreadsheets/d/14Hnm-jJbMJ98OsNaq1rmiZrHen9R-U7s_vhbj6pd7Vc/edit?resourcekey=&gid=1247134672#gid=1247134672"
           target="_blank"
           style="font-size:22px;"
         >
