@@ -132,6 +132,12 @@ startBtn.addEventListener("click", async () => {
     }
 
         resultBox.textContent = `あなたのチームは「${data.team}」！`;
+
+        // ★ 抽選後にボタンを非活性化
+        startBtn.disabled = true;
+        startBtn.style.opacity = "0.5";
+        startBtn.style.cursor = "not-allowed";
+        
       } catch (e) {
         resultBox.textContent = "通信エラーが発生しました";
       }
