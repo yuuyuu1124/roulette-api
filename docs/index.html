@@ -107,29 +107,29 @@
     const usernameInput = document.getElementById("username");
     const resultBox = document.getElementById("result");
 
-    startBtn.addEventListener("click", async () => {
-      const name = usernameInput.value.trim();
-      if (!name) {
-        alert("名前を入力してください！");
-        return;
-      }
+startBtn.addEventListener("click", async () => {
+  const name = usernameInput.value.trim();
+  if (!name) {
+    alert("名前を入力してください！");
+    return;
+  }
 
-      const rotateDeg = 3600 + Math.random() * 360;
-      wheel.style.transform = `rotate(${rotateDeg}deg)`;
-      resultBox.textContent = "抽選中…";
+  const rotateDeg = 3600 + Math.random() * 360;
+  wheel.style.transform = `rotate(${rotateDeg}deg)`;
+  resultBox.textContent = "抽選中…";
 
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name })
-        });
-        const data = await res.json();
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
+    });
+    const data = await res.json();
 
-        if (!data.ok) {
-          resultBox.textContent = data.error;
-          return;
-        }
+    if (!data.ok) {
+      resultBox.textContent = data.error;
+      return;
+    }
 
         resultBox.textContent = `あなたのチームは「${data.team}」！`;
       } catch (e) {
