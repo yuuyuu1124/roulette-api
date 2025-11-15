@@ -5,57 +5,112 @@
   <title>ゲームチーム分けルーレット</title>
 
   <style>
-    body {
-      font-family: "Arial", sans-serif;
-      text-align: center;
-      background: #fafafa;
-      padding-top: 20px;
-      margin: 0;
-    }
+body {
+  font-family: "Arial", sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 40px 10px;
+  background: #fafafa;
+}
 
-    h1 {
-      font-size: 30px;
-      margin-bottom: 20px;
-    }
+/* ルーレット */
+#wheel {
+  width: 240px;
+  height: 240px;
+  margin: 0 auto 25px auto;
+  border: 6px solid #333;
+  border-radius: 50%;
+  background: conic-gradient(
+    #ffe9a3 0deg 90deg,
+    #ff8b8b 90deg 180deg,
+    #8effbe 180deg 270deg,
+    #87b7ff 270deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
 
-    #inputArea {
-      margin-top: 10px;
-    }
+/* 入力＋ボタン縦並び */
+.control-area {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;  /* ← 自動的に均等な余白 */
+}
 
-    input {
-      padding: 8px;
-      font-size: 16px;
-      width: 160px;
-      margin-right: 5px;
-    }
+/* 入力欄 */
+.control-area input {
+  width: 260px;
+  font-size: 18px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-    button {
-      padding: 8px 16px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #2a7cf6;
-      color: white;
-    }
+/* ボタン共通 */
+.control-area button {
+  width: 260px;
+  padding: 10px 12px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-    #wheel {
-      width: 240px;
-      height: 240px;
-      margin: 30px auto;
-      border: 6px solid #333;
-      border-radius: 50%;
-      line-height: 240px;
-      font-size: 40px;
-      background: white;
-      transition: transform 4s ease-out;
-    }
+/* 回すボタン */
+#startBtn {
+  background: #46a452;
+}
+#startBtn:hover {
+  background: #3c8a47;
+}
 
-    #result {
-      margin-top: 15px;
-      font-size: 24px;
-      font-weight: bold;
-    }
+/* リセットボタン */
+#resetBtn {
+  background: #ff6b6b;
+}
+#resetBtn:hover {
+  background: #e85c5c;
+}
+
+/* 結果表示 */
+#result {
+  margin-top: 25px;
+  font-size: 24px;
+  font-weight: bold;
+  min-height: 32px;
+}
+/* タイトル */
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #333;
+  text-align: center;
+
+  /* 装飾ライン */
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, #4caf50, #87b7ff);
+  border-radius: 2px;
+}
+
   </style>
 </head>
 
