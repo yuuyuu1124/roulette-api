@@ -1,17 +1,13 @@
-import express from "express";
-import cors from "cors";
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// チームの最大人数（25人：A6 B6 C6 D7）
 const MAX = { A: 6, B: 6, C: 6, D: 7 };
-
-// 現在の人数
 let count = { A: 0, B: 0, C: 0, D: 0 };
 
-// ランダムにチームを割り当て（枠があるチームのみ）
 function assignTeam() {
   const available = Object.keys(MAX).filter(t => count[t] < MAX[t]);
   if (available.length === 0) return null;
@@ -21,11 +17,14 @@ function assignTeam() {
   return team;
 }
 
-// POST /assign でチームを配分
+app.get("/", (req, res) => {
+  res.send("API is running");
+});
+
 app.post("/assign", (req, res) => {
   const name = req.body.name || "noname";
-
   const team = assignTeam();
+
   if (!team) {
     return res.json({ ok: false, error: "全枠埋まりました" });
   }
@@ -33,7 +32,6 @@ app.post("/assign", (req, res) => {
   res.json({ ok: true, team, count, max: MAX });
 });
 
-// 状態確認API
 app.get("/status", (req, res) => {
   res.json({ count, max: MAX });
 });
