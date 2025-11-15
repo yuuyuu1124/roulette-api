@@ -3,43 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <title>ゲームチーム分けルーレット</title>
+
   <style>
     body {
-      font-family: Arial;
+      font-family: "Arial", sans-serif;
       text-align: center;
-      padding-top: 40px;
+      background: #fafafa;
+      padding-top: 20px;
+      margin: 0;
     }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    #inputArea {
+      margin-top: 10px;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      width: 160px;
+      margin-right: 5px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #2a7cf6;
+      color: white;
+    }
+
     #wheel {
-      width: 200px;
-      height: 200px;
-      margin: 20px auto;
-      border: 5px solid #333;
+      width: 240px;
+      height: 240px;
+      margin: 30px auto;
+      border: 6px solid #333;
       border-radius: 50%;
-      line-height: 200px;
-      font-size: 28px;
+      line-height: 240px;
+      font-size: 40px;
+      background: white;
       transition: transform 4s ease-out;
     }
-    button {
-      padding: 10px 18px;
-      font-size: 18px;
-      margin: 5px;
-    }
-    #resetBtn {
-      background: #f55;
-      color: #fff;
+
+    #result {
+      margin-top: 15px;
+      font-size: 24px;
+      font-weight: bold;
     }
   </style>
 </head>
+
 <body>
 
   <h1>🎡 ゲームチーム分けルーレット</h1>
 
-  <input id="username" type="text" placeholder="名前を入力" style="padding:6px;font-size:16px;">
-  <button id="startBtn">ルーレットを回す</button>
+  <div id="inputArea">
+    <input id="username" type="text" placeholder="名前を入力">
+    <button id="startBtn">ルーレットを回す</button>
+  </div>
 
   <div id="wheel">🎯</div>
 
-  <div id="result" style="font-size:22px;font-weight:bold;"></div>
+  <div id="result"></div>
 
   <script>
     const API_URL = "https://roulette-api-ffrx.onrender.com/assign";
@@ -66,6 +97,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name })
         });
+
         const data = await res.json();
 
         if (!data.ok) {
@@ -73,6 +105,7 @@
           return;
         }
 
+        // 結果表示
         result.textContent = `あなたのチームは「${data.team}」！`;
       } catch (e) {
         result.textContent = "通信エラーが発生しました";
