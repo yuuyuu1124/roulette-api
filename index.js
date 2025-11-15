@@ -74,3 +74,59 @@ app.post("/assign", async (req, res) => {
   // ******************************
   try {
     await fetch(GOOGLE_FORM_URL, {
+            method: "POST",
+      body: new URLSearchParams({
+        [ENTRY_NAME]: name,
+        [ENTRY_TEAM]: team
+      }),
+    });
+    console.log("Googleフォーム送信完了");
+  } catch (err) {
+    console.log("Googleフォーム送信エラー:", err);
+  }
+
+  // クライアントへ返す
+  res.json({
+    ok: true,
+    team,
+    count,
+  });
+});
+
+
+// ============================
+// 管理画面（/admin）
+// ============================
+app.get("/admin", (req, res) => {
+  res.send(`
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>抽選ログ管理画面</title>
+    </head>
+    <body style="font-family:Arial; text-align:center; padding-top:40px;">
+      <h1>抽選ログ管理画面</h1>
+
+      <p>以下のスプレッドシートにログが記録されています：</p>
+
+      <a href="https://docs.google.com/spreadsheets/d/1afL2PpEKgWL2xIuICwCsUUGmiTqHm0f2qBNrkiJwsgQ/edit"
+         target="_blank"
+         style="font-size:22px;">
+         ▶ スプレッドシートを開く
+      </a>
+
+      <br><br><br>
+      <p>（※Render 側ではログは保持していません。全てスプレッドシートに記録されます）</p>
+    </body>
+    </html>
+  `);
+});
+
+
+// ============================
+// サーバー起動
+// ============================
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
+
