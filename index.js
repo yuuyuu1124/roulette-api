@@ -38,3 +38,15 @@ app.get("/status", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Server started on " + PORT));
+
+
+const GOOGLE_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSfPuKeQq7PmZ9cO2PvYoBwQ4YpUsZztod0wqrb4Bh35gaWNow/formResponse";
+
+await fetch(GOOGLE_FORM_URL, {
+  method: "POST",
+  body: new URLSearchParams({
+    "entry.1273045262": name,
+    "entry.339524611": team
+  }),
+});
