@@ -69,9 +69,13 @@ app.post("/assign", async (req, res) => {
   try {
     await fetch(GOOGLE_FORM_URL, {
       method: "POST",
+      mode: "no-cors",   // ★ 重要：これでアラート防止
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
       body: new URLSearchParams({
         [ENTRY_NAME]: name,
-        [ENTRY_TEAM]: team,
+        [ENTRY_TEAM]: team
       }),
     });
     console.log("Googleフォーム送信完了");
