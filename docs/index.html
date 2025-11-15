@@ -3,124 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>ゲームチーム分けルーレット</title>
-
   <style>
-body {
-  font-family: "Arial", sans-serif;
-  text-align: center;
-  margin: 0;
-  padding: 40px 10px;
-  background: #fafafa;
-}
-
-/* ルーレット */
-#wheel {
-  width: 240px;
-  height: 240px;
-  margin: 0 auto 25px auto;
-  border: 6px solid #333;
-  border-radius: 50%;
-  background: conic-gradient(
-    #ffe9a3 0deg 90deg,
-    #ff8b8b 90deg 180deg,
-    #8effbe 180deg 270deg,
-    #87b7ff 270deg 360deg
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-}
-
-/* 入力＋ボタン縦並び */
-.control-area {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;  /* ← 自動的に均等な余白 */
-}
-
-/* 入力欄 */
-.control-area input {
-  width: 260px;
-  font-size: 18px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-/* ボタン共通 */
-.control-area button {
-  width: 260px;
-  padding: 10px 12px;
-  font-size: 18px;
-  border-radius: 6px;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-/* 回すボタン */
-#startBtn {
-  background: #46a452;
-}
-#startBtn:hover {
-  background: #3c8a47;
-}
-
-/* リセットボタン */
-#resetBtn {
-  background: #ff6b6b;
-}
-#resetBtn:hover {
-  background: #e85c5c;
-}
-
-/* 結果表示 */
-#result {
-  margin-top: 25px;
-  font-size: 24px;
-  font-weight: bold;
-  min-height: 32px;
-}
-/* タイトル */
-.title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: #333;
-  text-align: center;
-
-  /* 装飾ライン */
-  position: relative;
-  display: inline-block;
-  padding-bottom: 8px;
-}
-
-.title::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(to right, #4caf50, #87b7ff);
-  border-radius: 2px;
-}
-
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin:0;
+      padding:30px 10px;
+      text-align:center;
+      background:#f0f0f0;
+    }
+    h1 {
+      font-size:32px;
+      margin-bottom:20px;
+      color:#333;
+    }
+    #username {
+      width:200px;
+      padding:8px 10px;
+      font-size:16px;
+      border:1px solid #ccc;
+      border-radius:4px;
+      box-sizing:border-box;
+      margin-bottom:12px;
+    }
+    #controls {
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      gap:8px;
+    }
+    button {
+      padding:10px 16px;
+      font-size:16px;
+      border:none;
+      border-radius:4px;
+      cursor:pointer;
+      background:#007bff;
+      color:#fff;
+      transition:background 0.2s;
+    }
+    button:hover {
+      background:#0056b3;
+    }
+    #wheel {
+      width:260px;
+      height:260px;
+      margin:30px auto;
+      border:8px solid #444;
+      border-radius:50%;
+      background:conic-gradient(#ff4d4d 0deg 90deg, #4d79ff 90deg 180deg, #4dff88 180deg 270deg, #ffd54d 270deg 360deg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:48px;
+      color:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      transition:transform 4s cubic-bezier(0.33,1,0.68,1);
+    }
+    #result {
+      font-size:22px;
+      font-weight:bold;
+      margin-top:20px;
+      min-height:30px;
+      color:#333;
+    }
   </style>
 </head>
-
 <body>
 
   <h1>🎡 ゲームチーム分けルーレット</h1>
 
-  <div id="inputArea">
-    <input id="username" type="text" placeholder="名前を入力">
-    <button id="startBtn">ルーレットを回す</button>
+  <input id="username" type="text" placeholder="名前を入力">
+
+  <div id="controls">
+    <button id="startBtn">回す</button>
+    <button id="resetBtn" style="background:#ff5555;">リセット</button>
   </div>
 
   <div id="wheel">🎯</div>
@@ -132,40 +88,49 @@ body {
 
     const wheel = document.getElementById("wheel");
     const startBtn = document.getElementById("startBtn");
-    const result = document.getElementById("result");
+    const resetBtn = document.getElementById("resetBtn");
+    const usernameInput = document.getElementById("username");
+    const resultBox = document.getElementById("result");
 
-    startBtn.onclick = async () => {
-      const name = document.getElementById("username").value.trim();
+    startBtn.addEventListener("click", async () => {
+      const name = usernameInput.value.trim();
       if (!name) {
         alert("名前を入力してください！");
         return;
       }
 
-      // 回転アニメーション
-      wheel.style.transform = "rotate(" + (3600 + Math.random() * 360) + "deg)";
-      result.textContent = "抽選中…";
+      const rotateDeg = 3600 + Math.random() * 360;
+      wheel.style.transform = `rotate(${rotateDeg}deg)`;
+      resultBox.textContent = "抽選中…";
 
-      // APIへ送信
       try {
         const res = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name })
         });
-
         const data = await res.json();
 
         if (!data.ok) {
-          result.textContent = data.error;
+          resultBox.textContent = data.error;
           return;
         }
 
-        // 結果表示
-        result.textContent = `あなたのチームは「${data.team}」！`;
+        resultBox.textContent = `あなたのチームは「${data.team}」！`;
       } catch (e) {
-        result.textContent = "通信エラーが発生しました";
+        resultBox.textContent = "通信エラーが発生しました";
       }
-    };
+    });
+
+    resetBtn.addEventListener("click", () => {
+      wheel.style.transition = "none";
+      wheel.style.transform = "rotate(0deg)";
+      setTimeout(() => {
+        wheel.style.transition = "transform 4s cubic-bezier(0.33,1,0.68,1)";
+      }, 50);
+      resultBox.textContent = "";
+      usernameInput.value = "";
+    });
   </script>
 
 </body>
