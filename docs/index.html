@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ゲームチーム分けルーレット</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding-top: 40px;
+    }
+    #wheel {
+      width: 200px;
+      height: 200px;
+      margin: 20px auto;
+      border: 5px solid #333;
+      border-radius: 50%;
+      line-height: 200px;
+      font-size: 28px;
+      transition: transform 4s ease-out;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 18px;
+      margin: 5px;
+    }
+    #resetBtn {
+      background: #f55;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎡 ゲームチーム分けルーレット</h1>
+
+  <input id="username" type="text" placeholder="名前を入力" style="padding:6px;font-size:16px;">
+  <button id="startBtn">ルーレットを回す</button>
+
+  <div id="wheel">🎯</div>
+
+  <div id="result" style="font-size:22px;font-weight:bold;"></div>
+
+  <script>
+    const API_URL = "https://roulette-api-ffrx.onrender.com/assign";
+
+    const wheel = document.getElementById("wheel");
+    const startBtn = document.getElementById("startBtn");
+    const result = document.getElementById("result");
+
+    startBtn.onclick = async () => {
+      const name = document.getElementById("username").value.trim();
+      if (!name) {
+        alert("名前を入力してください！");
+        return;
+      }
+
+      // 回転アニメーション
+      wheel.style.transform = "rotate(" + (3600 + Math.random() * 360) + "deg)";
+      result.textContent = "抽選中…";
+
+      // APIへ送信
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+
+        if (!data.ok) {
+          result.textContent = data.error;
+          return;
+        }
+
+        result.textContent = `あなたのチームは「${data.team}」！`;
+      } catch (e) {
+        result.textContent = "通信エラーが発生しました";
+      }
+    };
+  </script>
+
+</body>
+</html>
