@@ -17,19 +17,22 @@
       color:#333;
     }
     #username {
-      width:200px;
-      padding:8px 10px;
-      font-size:16px;
-      border:1px solid #ccc;
-      border-radius:4px;
+      width: 260px;
+      font-size: 18px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
       box-sizing:border-box;
       margin-bottom:12px;
+      box-sizing: border-box;
     }
     #controls {
       margin-top:12px;
       display:flex;
       justify-content:center;
       gap:8px;
+      flex-direction: column;
+      align-items: center;
     }
     button {
       padding:10px 16px;
@@ -40,6 +43,7 @@
       background:#007bff;
       color:#fff;
       transition:background 0.2s;
+      width:260px;
     }
     button:hover {
       background:#0056b3;
@@ -70,15 +74,15 @@
 </head>
 <body>
 
-  <h1>🎡 ゲームチーム分けルーレット</h1> 
+  <h1>🎡 ゲームチーム分けルーレット 🎡</h1> 
 
   <div id="wheel">🎯</div>
 
   <input id="username" type="text" placeholder="名前を入力">
 
   <div id="controls">
-    <button id="startBtn">回す</button>
-    <button id="resetBtn" style="background:#ff5555;">リセット</button>
+    <button id="startBtn">抽選をする</button>
+    <button id="resetBtn" style="background:#ff5555;">名前をリセット</button>
   </div>
 
   <div id="result"></div>
