@@ -65,22 +65,23 @@ const sheets = google.sheets({ version: "v4", auth });
 // ============================
 async function loadCountFromSheet() {
   try {
-    // A2 〜 C500 までを読む（十分に大きな範囲）
-    const range = `${ANSWER_SHEET_NAME}!A2:Z1000`;
-
+    // ★ A:C を取得（空白行があっても全部取得される）
+    const range = `${ANSWER_SHEET_NAME}!A:C`;
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range,
     });
 
-    const rows = res.data.values || [];
+    // 1行目（ヘッダー）を除く
+    const rows = (res.data.values || []).slice(1);
+
     const newCount = { A: 0, B: 0, C: 0, D: 0 };
 
     for (const row of rows) {
-      const team = row[TEAM_COL_INDEX - 1]; // 0始まりなので -1
+      const team = row[TEAM_COL_INDEX - 1]; // team = C列
       if (team && newCount.hasOwnProperty(team)) {
-        newCount[team] += 1;
+        newCount[team]++;
       }
     }
 
@@ -90,6 +91,7 @@ async function loadCountFromSheet() {
     console.error("count の読み込みに失敗しました:", err.message);
   }
 }
+
 
 // ============================
 // 動作確認
