@@ -65,9 +65,9 @@ const sheets = google.sheets({ version: "v4", auth });
 // ============================
 async function loadCountFromSheet() {
   try {
-    // ★ A:C を取得（空白行があっても全部取得される）
-    const range = `${ANSWER_SHEET_NAME}!A:C`;
-
+    // A2:Z1000 → すべての行を強制的に取得
+    const range = `${ANSWER_SHEET_NAME}!A2:C`;
+    
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range,
