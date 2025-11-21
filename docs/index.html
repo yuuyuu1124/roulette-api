@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
-  <title>ゲームチーム分け</title>
+  <title>ゲームチーム分けルーレット</title>
+
   <style>
     body {
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -14,37 +14,28 @@
     }
     h1 {
       font-size:32px;
-      margin-bottom:20px;
+      margin-bottom:10px;
       color:#333;
     }
-    h1::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        bottom: 0;
-        transform: translateX(-50%);
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(to right, #4caf50, #87b7ff);
-        border-radius: 2px;
+    #deadline {
+      font-size:18px;
+      margin-bottom:20px;
+      color:#444;
     }
     #username {
-      width: 260px;
-      font-size: 18px;
-      padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      width:200px;
+      padding:8px 10px;
+      font-size:16px;
+      border:1px solid #ccc;
+      border-radius:4px;
       box-sizing:border-box;
       margin-bottom:12px;
-      box-sizing: border-box;
     }
     #controls {
       margin-top:12px;
       display:flex;
       justify-content:center;
       gap:8px;
-      flex-direction: column;
-      align-items: center;
     }
     button {
       padding:10px 16px;
@@ -55,10 +46,10 @@
       background:#007bff;
       color:#fff;
       transition:background 0.2s;
-      width:260px;
     }
-    button:hover {
-      background:#0056b3;
+    button:disabled {
+      opacity:0.5;
+      cursor:not-allowed;
     }
     #wheel {
       width:260px;
@@ -86,106 +77,103 @@
 </head>
 <body>
 
-  <h1>🎡 ゲームチーム分けルーレット 🎡</h1> 
+  <h1>🎡 ゲームチーム分けルーレット</h1>
 
-  <div id="wheel">🎯</div>
+  <div id="deadline">締切を読み込み中…</div>
 
   <input id="username" type="text" placeholder="名前を入力">
 
   <div id="controls">
-    <button id="startBtn">抽選をする</button>
-    <!-- button id="resetBtn" style="background:#ff5555;">名前をリセット</button -->
+    <button id="startBtn">回す</button>
+    <button id="resetBtn" style="background:#ff5555;">リセット</button>
   </div>
+
+  <div id="wheel">🎯</div>
 
   <div id="result"></div>
 
   <script>
-    const API_URL = "https://roulette-api-ffrx.onrender.com/assign";
-
-    const wheel = document.getElementById("wheel");
+    const API_URL = "https://roulette-api-ffrx.onrender.com";
     const startBtn = document.getElementById("startBtn");
     const resetBtn = document.getElementById("resetBtn");
     const usernameInput = document.getElementById("username");
+    const wheel = document.getElementById("wheel");
     const resultBox = document.getElementById("result");
+    const deadlineBox = document.getElementById("deadline");
 
-startBtn.addEventListener("click", async () => {
-  const name = usernameInput.value.trim();
-  if (!name) {
-    alert("名前を入力してください！");
-    return;
-  }
+    // ===== 期限読み込み =====
+    async function loadDeadline() {
+      const res = await fetch(API_URL + "/deadline");
+      const data = await res.json();
 
-  const rotateDeg = 3600 + Math.random() * 360;
-  wheel.style.transform = `rotate(${rotateDeg}deg)`;
-  resultBox.textContent = "抽選中…";
+      const d = new Date(data.deadline);
+      deadlineBox.textContent = "締切：" + d.toLocaleString("ja-JP");
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name })
-    });
-    const data = await res.json();
-
-    if (!data.ok) {
-      resultBox.textContent = data.error;
-      return;
+      // 締切過ぎてたら無効
+      if (new Date() > d) {
+        startBtn.disabled = true;
+        resultBox.textContent = "抽選は締め切りました";
+      }
     }
+    loadDeadline();
+
+
+    // ===== 抽選 =====
+    startBtn.addEventListener("click", async () => {
+      const name = usernameInput.value.trim();
+      if (!name) {
+        alert("名前を入力してください！");
+        return;
+      }
+
+      const rotateDeg = 3600 + Math.random() * 360;
+      wheel.style.transform = `rotate(${rotateDeg}deg)`;
+      resultBox.textContent = "抽選中…";
+
+      try {
+        const res = await fetch(API_URL + "/assign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+
+        const data = await res.json();
+
+        if (data.closed) {
+          resultBox.textContent = "抽選は締め切りました";
+          startBtn.disabled = true;
+          return;
+        }
+
+        if (!data.ok) {
+          resultBox.textContent = data.error;
+          return;
+        }
 
         resultBox.textContent = `あなたのチームは「${data.team}」！`;
 
-        // ★ 抽選後にボタンを非活性化
+        // 抽選後は非活性
         startBtn.disabled = true;
-        startBtn.style.opacity = "0.5";
-        startBtn.style.cursor = "not-allowed";
-        
-      } catch (e) {
+
+      } catch {
         resultBox.textContent = "通信エラーが発生しました";
       }
     });
 
+
+    // ===== リセット（見た目だけ） =====
     resetBtn.addEventListener("click", () => {
       wheel.style.transition = "none";
       wheel.style.transform = "rotate(0deg)";
       setTimeout(() => {
         wheel.style.transition = "transform 4s cubic-bezier(0.33,1,0.68,1)";
       }, 50);
+
       resultBox.textContent = "";
       usernameInput.value = "";
+      startBtn.disabled = false;
     });
 
-
-    const deadlineBox = document.createElement("div");
-      deadlineBox.style.marginTop = "10px";
-      deadlineBox.style.fontSize = "18px";
-      deadlineBox.style.color = "#444";
-      document.body.insertBefore(deadlineBox, document.body.firstChild);
-      
-      async function loadDeadline() {
-        const res = await fetch("https://roulette-api-ffrx.onrender.com/deadline");
-        const data = await res.json();
-      
-        const d = new Date(data.deadline);
-        deadlineBox.textContent = "締切：" + d.toLocaleString("ja-JP");
-      
-        // 締め切り済みならボタン無効化
-        if (new Date() > d) {
-          startBtn.disabled = true;
-          startBtn.style.opacity = "0.5";
-          resultBox.textContent = "抽選は締め切りました";
-        }
-      }
-      loadDeadline();
-
-    if (data.closed) {
-      resultBox.textContent = "抽選は締め切りました";
-      startBtn.disabled = true;
-      startBtn.style.opacity = "0.5";
-      return;
-    }
-
-
   </script>
-
 </body>
 </html>
