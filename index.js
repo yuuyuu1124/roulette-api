@@ -76,7 +76,12 @@ async function loadCountFromSheet() {
     // 1行目（ヘッダー）を除く
     const rows = (res.data.values || []).slice(1);
 
+    console.log("----- SHEET RAW DATA -----");
+    console.log(rows);
+    console.log("---------------------------");
+    
     const newCount = { A: 0, B: 0, C: 0, D: 0 };
+
 
     for (const row of rows) {
       const team = row[TEAM_COL_INDEX - 1]; // team = C列
