@@ -177,6 +177,14 @@ startBtn.addEventListener("click", async () => {
       }
       loadDeadline();
 
+    if (data.closed) {
+      resultBox.textContent = "抽選は締め切りました";
+      startBtn.disabled = true;
+      startBtn.style.opacity = "0.5";
+      return;
+    }
+
+
   </script>
 
 </body>
