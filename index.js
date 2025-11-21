@@ -218,6 +218,19 @@ async function init() {
   app.listen(PORT, () => console.log("Server running on " + PORT));
 }
 
+// ============================
+// 手動で Sheets から count を再読み込み
+// ============================
+app.get("/reload", async (req, res) => {
+  try {
+    await loadCountFromSheet();
+    res.json({ ok: true, message: "シートから再読み込みしました", count });
+  } catch (err) {
+    res.json({ ok: false, error: err.message });
+  }
+});
+
+
 init().catch(err => {
   console.error("サーバー起動時にエラー:", err);
 });
