@@ -242,3 +242,24 @@ app.get("/reload", async (req, res) => {
 init().catch(err => {
   console.error("サーバー起動時にエラー:", err);
 });
+
+// ============================
+// デバッグ用：実際に取得した rows を返す
+// ============================
+app.get("/debug", async (req, res) => {
+  try {
+    const range = `${ANSWER_SHEET_NAME}!A2:C`;
+    const result = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range,
+    });
+
+    res.json({
+      rows: result.data.values || [],
+      count,
+    });
+
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
