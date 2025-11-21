@@ -153,6 +153,30 @@ startBtn.addEventListener("click", async () => {
       resultBox.textContent = "";
       usernameInput.value = "";
     });
+
+
+    const deadlineBox = document.createElement("div");
+      deadlineBox.style.marginTop = "10px";
+      deadlineBox.style.fontSize = "18px";
+      deadlineBox.style.color = "#444";
+      document.body.insertBefore(deadlineBox, document.body.firstChild);
+      
+      async function loadDeadline() {
+        const res = await fetch("https://roulette-api-ffrx.onrender.com/deadline");
+        const data = await res.json();
+      
+        const d = new Date(data.deadline);
+        deadlineBox.textContent = "締切：" + d.toLocaleString("ja-JP");
+      
+        // 締め切り済みならボタン無効化
+        if (new Date() > d) {
+          startBtn.disabled = true;
+          startBtn.style.opacity = "0.5";
+          resultBox.textContent = "抽選は締め切りました";
+        }
+      }
+      loadDeadline();
+
   </script>
 
 </body>
