@@ -3,6 +3,7 @@
 // ============================
 import express from "express";
 import bodyParser from "body-parser";
+import fetch from "node-fetch";
 import cors from "cors";
 
 const app = express();
@@ -15,40 +16,72 @@ app.use(bodyParser.json());
 // チーム枠 初期値（固定）
 // ============================
 let count = { A: 0, B: 0, C: 0, D: 0 };
-let max = { A: 6, B: 6, C: 6, D: 6 };
+let max = { A: 6, B: 6, C: 6, D: 7 };
 
 // ============================
-// Googleフォーム送信URL
+// 締切日時（全ユーザー共通）
+// ============================
+// 2025/11/24 12:00（日本時間）
+let DEADLINE = new Date("2025-11-24T12:00:00+09:00");
+
+// ============================
+// Googleフォーム送信
 // ============================
 const GOOGLE_FORM_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSfPuKeQq7PmZ9cO2PvYoBwQ4YpUsZztod0wqrb4Bh35gaWNow/formResponse";
 
-// entry ID
-const ENTRY_NAME = "entry.1273045262"; // 名前
-const ENTRY_TEAM = "entry.339524611"; // チーム
+const ENTRY_NAME = "entry.1273045262";
+const ENTRY_TEAM = "entry.339524611";
+
 
 // ============================
-// ルート確認用
+// ルート確認
 // ============================
 app.get("/", (req, res) => {
   res.send("API is running");
 });
 
 // ============================
-// 現在の枠数表示（/status）
+// 現在の枠
 // ============================
 app.get("/status", (req, res) => {
   res.json({ count, max });
 });
 
 // ============================
-// 抽選API（/assign）
+// 締切取得
+// ============================
+app.get("/deadline", (req, res) => {
+  res.json({ deadline: DEADLINE });
+});
+
+// ============================
+// カウントリセット
+// ============================
+app.get("/reset", (req, res) => {
+  count = { A: 0, B: 0, C: 0, D: 0 };
+  res.json({ ok: true, message: "カウントをリセットしました", count });
+});
+
+// ============================
+// 抽選API
 // ============================
 app.post("/assign", async (req, res) => {
   const { name } = req.body;
-  if (!name) return res.json({ ok: false, error: "名前が必要です" });
+  if (!name) {
+    return res.json({ ok: false, error: "名前が必要です" });
+  }
 
-  // 空きがあるチームを抽出
+  // ★ 締切チェック
+  if (new Date() > DEADLINE) {
+    return res.json({
+      ok: false,
+      error: "抽選は締め切りました",
+      closed: true
+    });
+  }
+
+  // 空きがあるチーム
   const availableTeams = Object.keys(count).filter(
     (team) => count[team] < max[team]
   );
@@ -57,129 +90,28 @@ app.post("/assign", async (req, res) => {
     return res.json({ ok: false, error: "全枠が埋まりました" });
   }
 
-  // ランダム選出
+  // ランダム
   const team =
     availableTeams[Math.floor(Math.random() * availableTeams.length)];
 
   count[team]++;
 
-  // ============================
-  // Googleフォームへ送信
-  // ============================
+  // Googleフォーム送信（no-cors）
   try {
     await fetch(GOOGLE_FORM_URL, {
       method: "POST",
-      mode: "no-cors",   // ★ 重要：これでアラート防止
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         [ENTRY_NAME]: name,
         [ENTRY_TEAM]: team
       }),
     });
-    console.log("Googleフォーム送信完了");
-  } catch (err) {
-    console.log("Googleフォーム送信エラー:", err);
+  } catch (e) {
+    console.log("Google送信エラー:", e);
   }
 
-  // クライアントへ返す
-  res.json({
-    ok: true,
-    team,
-    count,
-  });
+  res.json({ ok: true, team });
 });
 
-// ============================
-// 管理画面（/admin）
-// ============================
-app.get("/admin", (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <meta charset="UTF-8" />
-        <title>抽選ログ管理画面</title>
-      </head>
-      <body style="font-family: Arial; text-align:center; padding:40px;">
-
-        <h1>抽選ログ管理画面</h1>
-
-        <p>以下のスプレッドシートにログが記録されています：</p>
-
-        <a
-          href="https://docs.google.com/spreadsheets/d/14Hnm-jJbMJ98OsNaq1rmiZrHen9R-U7s_vhbj6pd7Vc/edit?resourcekey=&gid=1247134672#gid=1247134672"
-          target="_blank"
-          style="font-size:22px;"
-        >
-          ▶ スプレッドシートを開く
-        </a>
-
-        <br><br><br>
-
-        <button 
-          onclick="resetCount()" 
-          style="padding:12px 22px; font-size:18px; background:#ff5555; color:white; border:none; border-radius:6px; cursor:pointer;">
-          🔄 カウントをリセットする
-        </button>
-
-        <p id="msg" style="margin-top:20px; font-size:18px; color:green;"></p>
-
-        <script>
-          function resetCount() {
-            fetch('/reset')
-              .then(r => r.json())
-              .then(d => {
-                document.getElementById('msg').textContent = "カウントをリセットしました！";
-              })
-              .catch(() => {
-                document.getElementById('msg').textContent = "エラーが発生しました";
-              });
-          }
-        </script>
-
-      </body>
-    </html>
-  `);
-});
-
-
-// ============================
-// カウントをリセット（/reset）
-// ============================
-app.get("/reset", (req, res) => {
-  count = { A: 0, B: 0, C: 0, D: 0 };
-  res.json({ ok: true, message: "カウントをリセットしました", count });
-});
-
-
-// ============================
-// サーバー起動
-// ============================
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-});
-
-
-// ============================
-// 締切日時（サーバー共通）
-// ============================
-// 例：2025-02-01 18:00 (日本時間)
-let DEADLINE = new Date("2025-02-01T18:00:00+09:00");
-
-// ============================
-// 締切取得API（/deadline）
-// ============================
-app.get("/deadline", (req, res) => {
-  res.json({ deadline: DEADLINE });
-});
-
-
-// 締切チェック
-if (new Date() > DEADLINE) {
-  return res.json({
-    ok: false,
-    error: "抽選は締め切りました",
-    closed: true
-  });
-}
+app.listen(PORT, () => console.log("Server running on " + PORT));
