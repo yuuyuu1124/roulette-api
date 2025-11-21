@@ -65,8 +65,9 @@ const sheets = google.sheets({ version: "v4", auth });
 // ============================
 async function loadCountFromSheet() {
   try {
-    // A2:C まで取得（1行目はヘッダ）
-    const range = `${ANSWER_SHEET_NAME}!A2:C`;
+    // A2 〜 C500 までを読む（十分に大きな範囲）
+    const range = `${ANSWER_SHEET_NAME}!A2:C500`;
+
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range,
