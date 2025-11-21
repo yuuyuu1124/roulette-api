@@ -38,7 +38,7 @@ const ENTRY_TEAM = "entry.339524611";
 // ============================
 
 // ★ フォーム回答が入っているスプレッドシートID
-const SHEET_ID = "18IPm3KGJCEGm5tV4eK8FUsebJXcIP2urXRw68XBzlJ4";
+const SHEET_ID = "1FQqbjJlI8GaQvueqCjg8taGFAZRz5IUKq5OHSRB5WRI";
 // ★ 回答シート名
 const ANSWER_SHEET_NAME = "フォームの回答 1";
 // ★ 列の定義（1列目=タイムスタンプ, 2列目=名前, 3列目=チーム）
