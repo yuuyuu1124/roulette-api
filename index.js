@@ -159,3 +159,27 @@ app.get("/reset", (req, res) => {
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
+
+
+// ============================
+// 締切日時（サーバー共通）
+// ============================
+// 例：2025-02-01 18:00 (日本時間)
+let DEADLINE = new Date("2025-02-01T18:00:00+09:00");
+
+// ============================
+// 締切取得API（/deadline）
+// ============================
+app.get("/deadline", (req, res) => {
+  res.json({ deadline: DEADLINE });
+});
+
+
+// 締切チェック
+if (new Date() > DEADLINE) {
+  return res.json({
+    ok: false,
+    error: "抽選は締め切りました",
+    closed: true
+  });
+}
