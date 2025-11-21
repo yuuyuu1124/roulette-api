@@ -111,6 +111,44 @@ app.post("/assign", async (req, res) => {
   }
 
   res.json({ ok: true, team });
+
+  // ============================
+// 管理画面（/admin）
+// ============================
+app.get("/admin", (req, res) => {
+  res.send(`
+    <html>
+    <body style="font-family:sans-serif; padding:30px;">
+      <h2>管理画面</h2>
+
+      <h3>現在のカウント</h3>
+      <pre>${JSON.stringify(count, null, 2)}</pre>
+
+      <h3>最大人数</h3>
+      <pre>${JSON.stringify(max, null, 2)}</pre>
+
+      <h3>締切日時</h3>
+      <p>${DEADLINE}</p>
+
+      <button onclick="resetCount()" 
+        style="padding:10px 20px; background:#f33; color:#fff; border:none; border-radius:5px;">
+        カウントリセット
+      </button>
+
+      <script>
+        function resetCount() {
+          if (confirm("本当にリセットしますか？")) {
+            fetch("/reset")
+              .then(r => r.json())
+              .then(d => alert("リセットしました"));
+          }
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
 });
 
 app.listen(PORT, () => console.log("Server running on " + PORT));
